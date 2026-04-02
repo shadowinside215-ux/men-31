@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // Collection: categories
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //
+    // Collection: products
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - price: number (required)
+    //   - category: string (required)
+    //   - image: string (required)
+    //
+    // Collection: settings
+    // Document ID: global
+    // Fields:
+    //   - logo: string
+    //   - facebook: string
+    //   - instagram: string
+    //   - whatsapp: string
+    //   - googleMaps: string
+    //   - layout: map
+    // ===============================================================
+
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.email == "samiarafati2006@gmail.com" && request.auth.token.email_verified == true);
+    }
+
+    function isValidCategory(data) {
+      return data.keys().hasAll(['name']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 50;
+    }
+
+    function isValidProduct(data) {
+      return data.keys().hasAll(['name', 'price', 'category', 'image']) &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.price is number && data.price >= 0 &&
+             data.category is string &&
+             data.image is string && data.image.size() < 1000;
+    }
+
+    function isValidSettings(data) {
+      return data.get('logo', '') is string &&
+             data.get('facebook', '') is string &&
+             data.get('instagram', '') is string &&
+             data.get('whatsapp', '') is string &&
+             data.get('googleMaps', '') is string &&
+             data.get('layout', {}) is map;
+    }
+
+    // Rules
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidCategory(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /settings/global {
+      allow read: if true;
+      allow write: if isAdmin() && isValidSettings(request.resource.data);
+    }
+  }
+}

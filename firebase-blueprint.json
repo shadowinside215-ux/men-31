@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "Category": {
+      "title": "Category",
+      "description": "A product category like Suits, Pants, etc.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the category" }
+      },
+      "required": ["name"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "A luxury clothing item.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Product name" },
+        "price": { "type": "number", "description": "Product price" },
+        "category": { "type": "string", "description": "Category name" },
+        "image": { "type": "string", "description": "Cloudinary image URL" }
+      },
+      "required": ["name", "price", "category", "image"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global website settings and layout.",
+      "type": "object",
+      "properties": {
+        "logo": { "type": "string" },
+        "facebook": { "type": "string" },
+        "instagram": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "googleMaps": { "type": "string" },
+        "layout": { "type": "object" }
+      }
+    }
+  },
+  "firestore": {
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Collection of product categories"
+    },
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of luxury menswear products"
+    },
+    "/settings/global": {
+      "schema": "Settings",
+      "description": "Global website configuration and layout positions"
+    }
+  }
+}
